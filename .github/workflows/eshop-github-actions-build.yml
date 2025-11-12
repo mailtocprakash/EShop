@@ -47,9 +47,9 @@ jobs:
       - name: Zip published EShopFunctionApp files
         run: |
           cd ./published_EShopFunctionApp
-          zip -r ../EShopFunctionApp.zip
+          zip -r ./published/EShopFunctionApp.zip
       - name: Zip published EShopWeb files
         run: |
           cd ./published_EShopWeb
-          zip -r ../EShopWeb.zip
+          zip -r ./published/EShopWeb.zip
 
