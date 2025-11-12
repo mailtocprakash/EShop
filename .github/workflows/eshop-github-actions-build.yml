@@ -36,7 +36,7 @@ jobs:
         run: dotnet build ./EShopWeb/EShopWeb.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./**/*.csproj -o ./published
+        run: dotnet publish ./EShopWeb/EShopWeb.sln -o ./published
         
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
