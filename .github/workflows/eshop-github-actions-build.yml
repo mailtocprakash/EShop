@@ -50,7 +50,7 @@ jobs:
       - name: Zip published EShopFunctionApp files
         run: |
           cd ./published_EShopFunctionApp
-          zip -r ./published/EShopFunctionApp.zip
+          zip -r ./EShopFunctionApp.zip
       - name: Zip published EShopWeb files
         run: |
           cd ./published_EShopWeb
