@@ -1,0 +1,139 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+resources:
+ pipelines:
+   - pipeline: EShopWebBuildPipeline
+     source: EShopWeb-CI-Build-Pipeline
+     trigger: 
+      branches: 
+       include:
+         - none
+
+trigger: none
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+stages: 
+  - stage: Staging
+    displayName: 'Deploy to Staging VM'    
+    jobs:
+    - deployment: DeployStaging
+      pool:
+        vmImage: 'windows-latest'
+      environment:
+       name: EShopEnvironments
+       resourceName: EShopWebStaging
+       resourceType: virtualMachine
+      strategy:
+       runOnce:
+        deploy:
+          steps:
+            - task: IISWebAppManagementOnMachineGroup@0
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StopWebsite'
+                StartStopWebsiteName: 'EShopWeb'                
+            - task: PowerShell@2
+              displayName: 'Stop App pool and Clean Web Root'
+              inputs:
+                targetType: 'inline'
+                script: |                  
+                  Import-Module WebAdministration
+                  Stop-WebAppPool -Name "EShopWeb"
+
+                  Write-Host "Taking ownership of $webRoot"                 
+                  $webRoot = "C:\inetpub\wwwroot\EShopWeb"
+
+                  Write-Host "Taking ownership of $webRoot"
+                  Start-Process -FilePath "takeown.exe" -ArgumentList "/f `"$webRoot`" /r /d y" -Wait -NoNewWindow
+                  Start-Process -FilePath "icacls.exe" -ArgumentList "`"$webRoot`" /grant Administrators:F /t" -Wait -NoNewWindow
+                                    
+                  Write-Host "Waiting 20 seconds to release file locks..."
+                  Start-Sleep -Seconds 20
+
+                  
+                  Get-ChildItem -Path "C:\inetpub\wwwroot\EShopWeb" -Recurse | Remove-Item -Force -Recurse
+
+            - task: ExtractFiles@1
+              inputs:
+                archiveFilePatterns: '$(Pipeline.Workspace)/EShopWebBuildPipeline/drop/EShopWeb.zip'
+                destinationFolder: 'C:\inetpub\wwwroot\EShopWeb'                
+                overwriteExistingFiles: true            
+            - task: PowerShell@2
+              displayName: 'Start App pool'
+              inputs:
+                targetType: 'inline'
+                script: |                  
+                  Import-Module WebAdministration
+                  Start-WebAppPool -Name "EShopWeb"                  
+            - task: IISWebAppManagementOnMachineGroup@0
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StartWebsite'
+                StartStopWebsiteName: 'EShopWeb'
+  - stage: Production
+    displayName: 'Deploy to Production VM'
+    dependsOn: Staging
+    condition: succeeded()    
+    jobs:
+    - deployment: DeployProduction
+      pool:
+        vmImage: 'windows-latest'
+      environment:
+       name: EShopEnvironments
+       resourceName: EShopWebProd
+       resourceType: virtualMachine
+      strategy:
+       runOnce:
+        deploy:
+          steps:
+            - task: IISWebAppManagementOnMachineGroup@0
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StopWebsite'
+                StartStopWebsiteName: 'EShopWeb'            
+
+            - task: PowerShell@2
+              displayName: 'Stop App pool and Clean Web Root'
+              inputs:
+                targetType: 'inline'
+                script: |     
+                  Import-Module WebAdministration
+                  Stop-WebAppPool -Name "EShopWeb"
+
+                  Write-Host "Taking ownership of $webRoot"                 
+                  $webRoot = "C:\inetpub\wwwroot\EShopWeb"
+
+                  Write-Host "Taking ownership of $webRoot"
+                  Start-Process -FilePath "takeown.exe" -ArgumentList "/f `"$webRoot`" /r /d y" -Wait -NoNewWindow
+                  Start-Process -FilePath "icacls.exe" -ArgumentList "`"$webRoot`" /grant Administrators:F /t" -Wait -NoNewWindow
+                                    
+                  Write-Host "Waiting 20 seconds to release file locks..."
+                  Start-Sleep -Seconds 20
+
+                  
+                  Get-ChildItem -Path "C:\inetpub\wwwroot\EShopWeb" -Recurse | Remove-Item -Force -Recurse            
+
+            - task: ExtractFiles@1
+              inputs:
+                archiveFilePatterns: '$(Pipeline.Workspace)/EShopWebBuildPipeline/drop/EShopWeb.zip'
+                destinationFolder: 'C:\inetpub\wwwroot\EShopWeb'                
+                overwriteExistingFiles: true            
+            - task: PowerShell@2
+              displayName: 'Start App pool'
+              inputs:
+                targetType: 'inline'
+                script: |                  
+                  Import-Module WebAdministration
+                  Start-WebAppPool -Name "EShopWeb"                  
+            - task: IISWebAppManagementOnMachineGroup@0
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StartWebsite'
+                StartStopWebsiteName: 'EShopWeb'

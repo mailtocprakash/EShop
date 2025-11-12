@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+/EShopWeb/bin/*
+/EShopWeb/obj/*
+/EShopWeb/bin/Debug/net8.0
+/EShopWeb/obj/Debug/net8.0
+/EShopWeb/.vs/*
+/EShopWeb/.vs/EShopWeb/config
+/EShopWeb/.vs/EShopWeb/v17/.suo
+/.vs/*
+/.vs/slnx.sqlite
+/EShopWeb/.vs/EShopWeb/FileContentIndex
+/EShopWeb/obj/Release/net8.0
+/EShopWeb/Properties/PublishProfiles
+/EShopDataAccessModel/bin/Debug/net8.0
+/EShopDataAccessModel/obj

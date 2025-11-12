@@ -1,0 +1,77 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+jobs:
+- job: ValidatePreReqSoftware
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+
+- job: BuildProject
+  dependsOn: ValidatePreReqSoftware
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      azureSubscription: 'EShopServiceConnection'
+      command: 'build'
+      projects: '**/*.csproj'
+
+- job: PublishProject
+  dependsOn: BuildProject
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      azureSubscription: 'EShopServiceConnection'
+      command: 'publish'
+      publishWebProjects: true
+      projects: '**/*.csproj'
+      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+- job: DeployWebApp
+  dependsOn: PublishProject
+  steps:
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Pipeline.Workspace)'
+  - task: AzureRmWebAppDeployment@5
+    inputs:
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'EShopServiceConnection'
+      appType: 'webApp'
+      WebAppName: 'eshoppingweb'
+      deployToSlotOrASE: true
+      ResourceGroupName: 'WP_SL_User_123'
+      SlotName: 'staging'
+      package: '$(Pipeline.Workspace)/drop/*.zip'
+      enableCustomDeployment: true
+      DeploymentType: 'zipDeploy'
+  - task: AzureAppServiceManage@0
+    inputs:
+      azureSubscription: 'EShopServiceConnection'
+      Action: 'Swap Slots'
+      WebAppName: 'eshoppingweb'
+      ResourceGroupName: 'WP_SL_User_123'
+      SourceSlot: 'staging'

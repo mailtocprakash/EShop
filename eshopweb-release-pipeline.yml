@@ -1,0 +1,78 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+resources:
+ pipelines:
+   - pipeline: EShopWebBuildPipeline
+     source: EShopWeb-CI-Build-Pipeline
+     trigger: 
+      branches: 
+       include:
+         - none
+
+trigger: none
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: Staging
+    displayName: 'Deploy to Staging Slot'
+    jobs:
+      - job: DeployStaging
+        pool:
+          vmImage: 'windows-latest' 
+        steps:
+        - task: DownloadPipelineArtifact@2
+          displayName: DownloadBuildArtifact
+          inputs:
+            buildType: 'specific'
+            project: '0b3e52d4-a81e-4d2f-b996-ee405e0fcc15'
+            definition: '2'
+            specificBuildWithTriggering: true
+            buildVersionToDownload: 'latest'
+            targetPath: '$(Pipeline.Workspace)'
+        - task: AzureRmWebAppDeployment@5
+          inputs:
+            ConnectionType: 'AzureRM'
+            azureSubscription: 'EShopServiceConnection'
+            appType: 'webApp'
+            WebAppName: 'eshoppingweb'
+            deployToSlotOrASE: true
+            ResourceGroupName: 'WP_SL_User_123'
+            SlotName: 'staging'
+            package: '$(Pipeline.Workspace)/drop/*.zip'
+            enableCustomDeployment: true
+            DeploymentType: 'zipDeploy'
+  - stage: Production
+    displayName: 'Deploy to Production Slot'
+    dependsOn: Staging
+    condition: succeeded()    
+    jobs:
+    - job: DeployProduction
+      displayName: 'Deploy to Production'
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+        - task: DownloadPipelineArtifact@2
+          displayName: DownloadBuildArtifact
+          inputs:
+            buildType: 'specific'
+            project: '0b3e52d4-a81e-4d2f-b996-ee405e0fcc15'
+            definition: '2'
+            specificBuildWithTriggering: true
+            buildVersionToDownload: 'latest'
+            targetPath: '$(Pipeline.Workspace)'
+        - task: AzureRmWebAppDeployment@5
+          inputs:
+            ConnectionType: 'AzureRM'
+            azureSubscription: 'EShopServiceConnection'
+            appType: 'webApp'
+            WebAppName: 'eshoppingweb'
+            packageForLinux: '$(Pipeline.Workspace)/drop/*.zip'
+            enableCustomDeployment: true
+            DeploymentType: 'zipDeploy'
