@@ -35,18 +35,21 @@ jobs:
       - name: Build Project
         run: dotnet build ./EShopWeb/EShopWeb.sln --configuration Release --no-restore
 
-      - name: Publish
-        run: dotnet publish ./EShopWeb/EShopWeb.sln -o ./published
+      - name: Publish FunctionApp
+        run: dotnet publish ./EShopFunctionApp/EShopFunctionApp.csproj -o ./published_EShopFunctionApp
+        
+      - name: Publish WebApp
+        run: dotnet publish ./EShopWeb/EShopWeb.csproj -o ./published_EShopWeb
         
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
         
       - name: Zip published EShopFunctionApp files
         run: |
-          cd ./published/EShopFunctionApp
+          cd ./published_EShopFunctionApp
           zip -r ../EShopFunctionApp.zip
       - name: Zip published EShopWeb files
         run: |
-          cd ./published/EShopWeb
+          cd ./published_EShopWeb
           zip -r ../EShopWeb.zip
 
