@@ -37,3 +37,7 @@ jobs:
 
       - name: Publish
         run: dotnet publish ./EShopWeb/EShopWeb.sln -o ./published
+        
+      - name: List files
+        run: |
+          ls -R  # List files recursively to confirm the path
