@@ -41,3 +41,12 @@ jobs:
       - name: List files
         run: |
           ls -R  # List files recursively to confirm the path
+      - name: Zip published EShopFunctionApp files
+        run: |
+          cd ./published/EShopFunctionApp
+          zip -r ../EShopFunctionApp.zip
+      - name: Zip published EShopWeb files
+        run: |
+          cd ./published/EShopWeb
+          zip -r ../EShopWeb.zip
+
