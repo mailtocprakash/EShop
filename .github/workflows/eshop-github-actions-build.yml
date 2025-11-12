@@ -26,7 +26,7 @@ jobs:
           dotnet-version: ${{matrix.dotnet-version}}
 
       - name: Restore Packages
-        run: dotnet restore */EShopWeb/EShopWeb.sln
+        run: dotnet restore ./src/EShopWeb/EShopWeb.sln
 
       - name: Build Project
         run: dotnet build --configuration Release --no-restore
