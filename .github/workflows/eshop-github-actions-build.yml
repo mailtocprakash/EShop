@@ -14,9 +14,6 @@ jobs:
       - name: Checkout the Projects
         uses: actions/checkout@v4
         
-      - name: List the contents of the working directory
-        run: ls -la  # List files in the current directory (Unix/Linux)
-
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
         
@@ -39,26 +36,23 @@ jobs:
         run: dotnet publish ./EShopFunctionApp/EShopFunctionApp.csproj -o ./published_EShopFunctionApp
         
       - name: Publish WebApp
-        run: dotnet publish ./EShopWeb/EShopWeb.csproj -o ./published_EShopWeb
-        
-      - name: Show directory structure (optional)
-        run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
-        
-      - name: List contents of the published directory
-        run: ls -R ./published_EShopFunctionApp 
-      - name: Check full path and zip published files
+        run: dotnet publish ./EShopWeb/EShopWeb.csproj -o ./published_EShopWeb  
+              
+      - name: Check full path and zip published EShopFunctionApp files
         run: |
           echo "Current directory: $(pwd)"  # Print the current working directory
           echo "Listing contents in the absolute path: $(pwd)/published_EShopFunctionApp"
           ls -R $(pwd)/published_EShopFunctionApp  # List files with absolute path
           # Now zip the files using absolute paths
           zip -r $(pwd)/published_EShopFunctionApp.zip $(pwd)/published_EShopFunctionApp 
-      - name: Zip published EShopFunctionApp files
+          
+      - name: Check full path and zip published EShopWeb files
         run: |
-          cd ./published_EShopFunctionApp
-          zip -r ./EShopFunctionApp.zip
-      - name: Zip published EShopWeb files
-        run: |
-          cd ./published_EShopWeb
-          zip -r ./published/EShopWeb.zip
-
+          echo "Current directory: $(pwd)"  # Print the current working directory
+          echo "Listing contents in the absolute path: $(pwd)/published_EShopWeb"
+          ls -R $(pwd)/published_EShopWeb  # List files with absolute path
+          # Now zip the files using absolute paths
+          zip -r $(pwd)/published_EShopWeb.zip $(pwd)/published_EShopWeb
+          
+      - name: Show directory structure (optional)
+        run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
