@@ -56,3 +56,15 @@ jobs:
           
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
+        
+      - name: Upload EShopFunctionApp artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: EShopWeb  # The name for the artifact
+          path: ./published_EShopFunctionApp.zip  # Path to the .zip file to upload
+          
+      - name: Upload EShopWeb artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: EShopWeb  # The name for the artifact
+          path: ./published_EShopWeb.zip  # Path to the .zip file to upload
