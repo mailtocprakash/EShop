@@ -44,6 +44,9 @@ jobs:
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
         
+      - name: List contents of the published directory
+        run: ls -R ./published_EShopFunctionApp 
+        
       - name: Zip published EShopFunctionApp files
         run: |
           cd ./published_EShopFunctionApp
