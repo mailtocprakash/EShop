@@ -60,7 +60,7 @@ jobs:
       - name: Upload EShopFunctionApp artifact
         uses: actions/upload-artifact@v5.0.0
         with:
-          name: EShopWeb  # The name for the artifact
+          name: EShopFunctionApp  # The name for the artifact
           path: ./published_EShopFunctionApp.zip  # Path to the .zip file to upload
           
       - name: Upload EShopWeb artifact
