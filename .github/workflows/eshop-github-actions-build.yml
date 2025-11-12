@@ -13,6 +13,12 @@ jobs:
     steps:
       - name: Checkout the Projects
         uses: actions/checkout@v4
+        
+      - name: List the contents of the working directory
+        run: ls -la  # List files in the current directory (Unix/Linux)
+
+      - name: Show directory structure (optional)
+        run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5.0.0
