@@ -47,11 +47,4 @@ jobs:
         uses: actions/upload-artifact@v5.0.0
         with:
           name: EShopWeb  # The name for the artifact
-          path: ./published_EShopWeb  # Path to the .zip file to upload
-      - name: Publish to Azure Artifacts
-        uses: Azure/artifacts-actions@v1
-        with:
-          feedName: 'EShop'
-          artifactName: 'EShopFunctionApp'
-          path: 'path/to/your/artifacts' # Directory or file to publish
-          # Ensure you have AZURE_DEVOPS_TOKEN or similar secrets configured for authentication
+          path: ./published_EShopWeb  # Path to the .zip file to upload     
