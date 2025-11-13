@@ -29,10 +29,10 @@ jobs:
         run: dotnet build ./EShopWeb/EShopWeb.sln --configuration Release --no-restore
 
       - name: Publish FunctionApp
-        run: dotnet publish ./EShopFunctionApp/EShopFunctionApp.csproj -o ./published_EShopFunctionApp
+        run: dotnet publish ./EShopFunctionApp/EShopFunctionApp.csproj --configuration Release -o ./published_EShopFunctionApp
         
       - name: Publish WebApp
-        run: dotnet publish ./EShopWeb/EShopWeb.csproj -o ./published_EShopWeb                
+        run: dotnet publish ./EShopWeb/EShopWeb.csproj --configuration Release -o ./published_EShopWeb                
                 
       - name: Show directory structure (optional)
         run: tree  # If you want to see a tree-like structure, ensure 'tree' is installed
